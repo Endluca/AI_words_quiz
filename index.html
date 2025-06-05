@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI知识小测验</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        #quiz-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        #header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        #header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        #header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        #quiz-content {
+            padding: 30px;
+        }
+        
+        #question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        #question-text {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        #options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.2);
+        }
+        
+        .option-prefix {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            font-size: 16px;
+        }
+        
+        .option-text {
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .option.selected {
+            background: #fff3e0;
+            border-color: #ff9800;
+        }
+        
+        .option.correct {
+            background: #e8f5e8;
+            border-color: #4caf50;
+            animation: correctPulse 0.6s ease;
+        }
+        
+        .option.incorrect {
+            background: #ffebee;
+            border-color: #f44336;
+            animation: incorrectShake 0.6s ease;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes incorrectShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        #feedback-container {
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        #result-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounceIn 0.8s ease;
+        }
+        
+        #feedback-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        #explanation-text {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        #next-btn, #download-btn, #restart-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        #next-btn:hover, #download-btn:hover, #restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        #results-container {
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        #results-container h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        #score-container {
+            position: relative;
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 3s ease-out forwards;
+        }
+        
+        @keyframes particleFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0.5);
+            }
+        }
+        
+        #score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            z-index: 2;
+            animation: scoreCircleGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes scoreCircleGlow {
+            0% {
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            }
+            100% {
+                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5), 0 0 20px rgba(102, 126, 234, 0.3);
+            }
+        }
+        
+        #score-text {
+            font-size: 60px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        #total-text {
+            font-size: 24px;
+            opacity: 0.9;
+        }
+        
+        #score-message {
+            font-size: 18px;
+            color: #333;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+            animation: messageSlideIn 0.8s ease;
+        }
+        
+        #result-canvas-container {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+        }
+        
+        #result-canvas {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        #progress-container {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+        
+        #progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 20%;
+        }
+        
+        #progress-text {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* 答对时的庆祝动画 */
+        .correct-celebration {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .celebration-burst {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #ffd700, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            animation: celebrationBurst 1s ease-out;
+            pointer-events: none;
+        }
+        
+        @keyframes celebrationBurst {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(3);
+                opacity: 0;
+            }
+        }
+        
+        .star-shower {
+            position: absolute;
+            font-size: 20px;
+            animation: starFall 2s ease-out forwards;
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        @keyframes starFall {
+            0% {
+                opacity: 1;
+                transform: translateY(-20px) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100px) rotate(360deg);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            #quiz-container {
+                margin: 0;
+            }
+            
+            #header {
+                padding: 20px;
+            }
+            
+            #header h1 {
+                font-size: 24px;
+            }
+            
+            #quiz-content {
+                padding: 20px;
+            }
+            
+            #question-text {
+                font-size: 18px;
+            }
+            
+            .option {
+                padding: 12px 15px;
+            }
+            
+            .option-text {
+                font-size: 14px;
+            }
+            
+            #score-circle {
+                width: 150px;
+                height: 150px;
+            }
+            
+            #score-text {
+                font-size: 40px;
+            }
+            
+            #total-text {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <div id="header">
+            <h1>🤖 AI知识小测验</h1>
+            <p>测试你对人工智能的了解程度</p>
+        </div>
+        
+        <div id="quiz-content">
+            <div id="question-container">
+                <div id="question-number">问题 1</div>
+                <div id="question-text">问题将在这里显示</div>
+                <div id="options-container">
+                    <!-- 选项将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <div id="feedback-container" class="hidden">
+                <div id="result-icon">🎉</div>
+                <h3 id="feedback-title">反馈标题</h3>
+                <p id="explanation-text">解释文本将在这里显示</p>
+                <button id="next-btn">下一题</button>
+            </div>
+            
+            <div id="results-container" class="hidden">
+                <h2>🎊 测验完成！</h2>
+                <div id="score-container">
+                    <div id="particles-container"></div>
+                    <div id="score-circle">
+                        <div id="score-text">0</div>
+                        <div id="total-text">/100</div>
+                    </div>
+                </div>
+                <p id="score-message"></p>
+                <div id="result-canvas-container">
+                    <canvas id="result-canvas" width="600" height="400"></canvas>
+                </div>
+                <button id="download-btn">下载成绩单</button>
+                <button id="restart-btn">重新测试</button>
+            </div>
+        </div>
+        <div id="progress-container">
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+            <div id="progress-text">1/5</div>
+        </div>
+    </div>
+
+    <script>
+        // 立即执行函数，避免全局变量污染
+        (function() {
+            // 测验数据 - 使用用户提供的新题目
+            const originalQuizData = [
+                {
+                    question: "人工智能(AI)学习的过程最类似于以下哪种比喻？",
+                    options: [
+                        "一个能预测你喜好的淘宝/抖音推荐算法",
+                        "一个从小白到大神的编程学习者",
+                        "一个掌握所有知识的百科全书",
+                        "一台按照固定规则运行的老式电脑"
+                    ],
+                    answer: 1, // 对应选项B
+                    explanation: "AI学习过程就像一个零基础小白逐步成长为大神的历程。例如文心一言、讯飞星火等国内大模型，通过海量数据训练，从最初只能简单回复到现在能够理解复杂需求，这种进阶过程类似程序员从'Hello World'到架构复杂系统的成长曲线。就像B站上那些学习编程的UP主，AI也是从不断'刷题'中找到规律并提升能力的。"
+                },
+                {
+                    question: "在AI领域中，什么是'提示词'(Prompt)？",
+                    options: [
+                        "AI模型的源代码组成部分",
+                        "用户引导AI生成特定输出的指令或问题",
+                        "训练AI的核心数据集",
+                        "AI错误回应的纠正信息"
+                    ],
+                    answer: 1, // 对应选项B
+                    explanation: "提示词就像跟AI沟通的'暗语'，是让大模型按你想法办事的关键。好比你在微信上发'在吗'和'我想了解如何制作高质量PPT'，得到的回应质量完全不同。国内已经出现专门的'提示词工程师'，能用精准提示词让文心一言生成电商爆款文案，帮助讯飞星火设计创意海报。小红书和知乎上的'ChatGPT提示词指南'动辄获得十万+点赞，说明掌握这门'与AI对话的艺术'已成为2024年的热门技能。"
+                },
+                {
+                    question: "大语言模型(LLM)最贴切的描述是什么？",
+                    options: [
+                        "一个能模仿人类对话的超级AI助手",
+                        "一个存储海量知识的智能数据库",
+                        "一个预测下一个词语概率的复杂神经网络",
+                        "一个可以替代程序员的编码系统"
+                    ],
+                    answer: 2, // 对应选项C
+                    explanation: "大语言模型的本质就像超级版的'搜狗输入法智能预测'，核心功能是预测下一个最合理的词。例如国产大模型文心一言，当你输入'今天天气真'，它会计算'好'、'差'、'热'等词出现的概率并选择最合适的。只不过LLM的规模和复杂度远超输入法，通过海量参数(如GPT-4的万亿参数)使这种预测能力达到了足以模拟人类思维的程度。这也解释了为什么同样的提示词多问几次，可能会得到不同的回答。"
+                },
+                {
+                    question: "API密钥的功能类似于什么？",
+                    options: [
+                        "访问高级内容的会员卡",
+                        "连接AI服务的专属通行证",
+                        "保护数据安全的加密工具",
+                        "提升AI性能的加速器"
+                    ],
+                    answer: 1, // 对应选项B
+                    explanation: "API密钥就像是你连接AI大模型的专属VIP通行证，没有它，你的应用就无法调用智能服务。举个例子，如果你想在自己的微信小程序中接入百度文心一言或阿里通义千问的能力，就需要申请API密钥。这串密钥会记录你的使用量和付费情况，就像使用云服务器的AccessKey一样。在国内AI创业圈，一个好的产品往往会整合多家API服务，比如同时调用讯飞的语音识别、腾讯的图像分析和百度的文本生成，每一项都需要单独的API密钥作为'通行证'。"
+                },
+                {
+                    question: "AI的'上下文窗口'(Context Window)指的是什么？",
+                    options: [
+                        "AI能够记住的对话历史长度",
+                        "AI运行的操作系统界面",
+                        "AI处理信息的速度限制",
+                        "AI算法的核心设计架构"
+                    ],
+                    answer: 0, // 对应选项A
+                    explanation: "上下文窗口就像AI的'短期记忆'容量，决定了它能记住多少之前的对话内容。这就像微信聊天时，你能上滑查看多少历史消息。早期GPT-3只有4K上下文窗口(约3000字)，而最新的GPT-4o和Claude 3已达到128K(约10万字)，国内的文心一言4.0也提升到了32K窗口。更大的上下文窗口意味着AI可以'记住'更长的对话，所以你现在能让模型分析整篇论文或处理长达数小时的会议记录，而不必像以前那样频繁提醒它之前说过什么。这也是为什么现在的AI助手比一年前更'聪明'的重要原因。"
+                }
+            ];
+            
+            // 选项乱序函数
+            function shuffleOptions(questionData) {
+                const originalAnswer = questionData.answer;
+                const optionsWithIndex = questionData.options.map((option, index) => ({
+                    text: option,
+                    originalIndex: index
+                }));
+                
+                // Fisher-Yates 洗牌算法
+                for (let i = optionsWithIndex.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [optionsWithIndex[i], optionsWithIndex[j]] = [optionsWithIndex[j], optionsWithIndex[i]];
+                }
+                
+                // 找到正确答案在新顺序中的位置
+                const newAnswer = optionsWithIndex.findIndex(item => item.originalIndex === originalAnswer);
+                
+                return {
+                    ...questionData,
+                    options: optionsWithIndex.map(item => item.text),
+                    answer: newAnswer
+                };
+            }
+            
+            // 初始化时对所有题目进行选项乱序
+            const quizData = originalQuizData.map(shuffleOptions);
+            
+            // 测验状态变量
+            let currentQuestion = 0;
+            let score = 0;
+            let userAnswers = [];
+            
+            // 初始化测验
+            function initQuiz() {
+                showQuestion(0);
+                updateProgress();
+            }
+            
+            // 显示问题
+            // 显示问题
+            function showQuestion(index) {
+                const questionData = quizData[index];
+                
+                // 更新问题编号和文本
+                document.getElementById('question-number').textContent = `问题 ${index + 1}`;
+                document.getElementById('question-text').textContent = questionData.question;
+                
+                // 清空并重新填充选项容器
+                const optionsContainer = document.getElementById('options-container');
+                optionsContainer.innerHTML = '';
+                
+                // 添加选项
+                const optionLetters = ['A', 'B', 'C', 'D'];
+                questionData.options.forEach((option, i) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    optionElement.style.pointerEvents = 'auto'; // 确保新选项可以点击
+                    optionElement.innerHTML = `
+                        <div class="option-prefix">${optionLetters[i]}</div>
+                        <div class="option-text">${option}</div>
+                    `;
+                    
+                    // 添加点击事件
+                    optionElement.addEventListener('click', () => selectOption(i));
+                    
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+                // 隐藏反馈容器，显示问题容器
+                document.getElementById('feedback-container').classList.add('hidden');
+                document.getElementById('question-container').classList.remove('hidden');
+                document.getElementById('results-container').classList.add('hidden');
+                
+                // 更新进度文本
+                document.getElementById('progress-text').textContent = `${index + 1}/${quizData.length}`;
+            }
+            
+            // 选择选项
+            // 选择选项
+            function selectOption(optionIndex) {
+                const questionData = quizData[currentQuestion];
+                const options = document.querySelectorAll('.option');
+                
+                // 防止重复选择 - 检查是否已经有任何选项被选中或标记
+                const hasSelectedOption = Array.from(options).some(option => 
+                    option.classList.contains('selected') || 
+                    option.classList.contains('correct') || 
+                    option.classList.contains('incorrect')
+                );
+                
+                if (hasSelectedOption) {
+                    return; // 如果已经选择过，直接返回
+                }
+                
+                // 记录用户答案
+                userAnswers[currentQuestion] = optionIndex;
+                
+                // 标记选中的选项
+                options[optionIndex].classList.add('selected');
+                
+                // 禁用所有选项的点击事件
+                options.forEach(option => {
+                    option.style.pointerEvents = 'none';
+                });
+                
+                // 显示正确和错误的选项
+                setTimeout(() => {
+                    options[questionData.answer].classList.add('correct');
+                    
+                    if (optionIndex !== questionData.answer) {
+                        options[optionIndex].classList.add('incorrect');
+                    } else {
+                        // 答对时显示炫酷奖励效果
+                        showCorrectCelebration();
+                    }
+                    
+                    // 显示反馈
+                    showFeedback(optionIndex === questionData.answer);
+                }, 500);
+            }
+            
+            // 答对时的炫酷庆祝效果
+            function showCorrectCelebration() {
+                const container = document.getElementById('quiz-content');
+                
+                // 创建爆炸效果
+                const burst = document.createElement('div');
+                burst.className = 'celebration-burst';
+                container.appendChild(burst);
+                
+                // 创建星星雨效果
+                for (let i = 0; i < 12; i++) {
+                    setTimeout(() => {
+                        const star = document.createElement('div');
+                        star.className = 'star-shower';
+                        star.textContent = '⭐';
+                        star.style.left = Math.random() * 100 + '%';
+                        star.style.top = Math.random() * 50 + 25 + '%';
+                        container.appendChild(star);
+                        
+                        // 2秒后移除星星
+                        setTimeout(() => {
+                            if (star.parentNode) {
+                                star.parentNode.removeChild(star);
+                            }
+                        }, 2000);
+                    }, i * 100);
+                }
+                
+                // 1秒后移除爆炸效果
+                setTimeout(() => {
+                    if (burst.parentNode) {
+                        burst.parentNode.removeChild(burst);
+                    }
+                }, 1000);
+            }
+            
+            // 显示反馈
+            function showFeedback(isCorrect) {
+                const feedbackContainer = document.getElementById('feedback-container');
+                const resultIcon = document.getElementById('result-icon');
+                const feedbackTitle = document.getElementById('feedback-title');
+                const explanationText = document.getElementById('explanation-text');
+                
+                // 更新反馈内容
+                if (isCorrect) {
+                    resultIcon.textContent = '🎉';
+                    feedbackTitle.textContent = '太棒了！回答正确！+20分';
+                    score += 20; // 每题20分
+                } else {
+                    resultIcon.textContent = '❌';
+                    feedbackTitle.textContent = '回答错误！+0分';
+                }
+                
+                explanationText.textContent = quizData[currentQuestion].explanation;
+                
+                // 显示反馈容器
+                feedbackContainer.classList.remove('hidden');
+                
+                // 添加下一题按钮事件
+                document.getElementById('next-btn').onclick = nextQuestion;
+            }
+            
+            // 下一题
+            function nextQuestion() {
+                currentQuestion++;
+                
+                if (currentQuestion < quizData.length) {
+                    showQuestion(currentQuestion);
+                    updateProgress();
+                } else {
+                    showResults();
+                }
+            }
+            
+            // 更新进度条
+            function updateProgress() {
+                const progressFill = document.getElementById('progress-fill');
+                const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+                progressFill.style.width = progressPercentage + '%';
+            }
+            
+            // 创建粒子效果
+            function createParticles() {
+                const particlesContainer = document.getElementById('particles-container');
+                
+                for (let i = 0; i < 30; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'particle';
+                        
+                        // 随机位置和颜色
+                        const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+                        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                        particle.style.left = Math.random() * 100 + '%';
+                        particle.style.top = Math.random() * 100 + '%';
+                        
+                        particlesContainer.appendChild(particle);
+                        
+                        // 3秒后移除粒子
+                        setTimeout(() => {
+                            if (particle.parentNode) {
+                                particle.parentNode.removeChild(particle);
+                            }
+                        }, 3000);
+                    }, i * 100);
+                }
+            }
+            
+            // 数字动画效果
+            function animateScore(finalScore) {
+                const scoreElement = document.getElementById('score-text');
+                let currentScore = 0;
+                const increment = finalScore / 50; // 50步完成动画
+                
+                const timer = setInterval(() => {
+                    currentScore += increment;
+                    if (currentScore >= finalScore) {
+                        currentScore = finalScore;
+                        clearInterval(timer);
+                    }
+                    scoreElement.textContent = Math.floor(currentScore);
+                }, 40);
+            }
+            
+            // 显示结果
+            function showResults() {
+                const resultsContainer = document.getElementById('results-container');
+                const questionContainer = document.getElementById('question-container');
+                const feedbackContainer = document.getElementById('feedback-container');
+                const scoreMessage = document.getElementById('score-message');
+                
+                // 隐藏问题和反馈容器
+                questionContainer.classList.add('hidden');
+                feedbackContainer.classList.add('hidden');
+                
+                // 显示结果容器
+                resultsContainer.classList.remove('hidden');
+                
+                // 创建粒子效果
+                createParticles();
+                
+                // 动画显示分数
+                setTimeout(() => {
+                    animateScore(score);
+                }, 500);
+                
+                // 根据分数显示不同的消息
+                let message = '';
+                if (score === 100) {
+                    message = '🎉 太棒了！你是AI领域的专家！满分成就达成！';
+                } else if (score >= 80) {
+                    message = '🌟 做得很好！你对AI有很好的理解！';
+                } else if (score >= 60) {
+                    message = '👍 不错的尝试！继续学习AI知识吧！';
+                } else if (score >= 40) {
+                    message = '📖 还有进步空间，多了解一些AI知识会更好！';
+                } else {
+                    message = '💪 继续努力！AI领域等待你的探索！';
+                }
+                
+                scoreMessage.textContent = message;
+                
+                // 生成结果图片
+                generateResultImage();
+                
+                // 添加下载按钮事件
+                document.getElementById('download-btn').onclick = downloadResult;
+                
+                // 添加重新开始按钮事件
+                document.getElementById('restart-btn').onclick = restartQuiz;
+                
+                // 隐藏进度条
+                document.getElementById('progress-container').style.display = 'none';
+            }
+            
+            // 生成结果图片
+            function generateResultImage() {
+                const canvas = document.getElementById('result-canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 设置背景
+                ctx.fillStyle = '#f5f7fa';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 添加标题
+                ctx.fillStyle = '#764ba2';
+                ctx.font = 'bold 24px "Segoe UI", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('AI知识小测验成绩单', canvas.width / 2, 40);
+                
+                // 添加分数
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 36px "Segoe UI", sans-serif';
+                ctx.fillText(`${score}/100分`, canvas.width / 2, 100);
+                
+                // 添加日期
+                const date = new Date();
+                ctx.font = '16px "Segoe UI", sans-serif';
+                ctx.fillStyle = '#666';
+                ctx.fillText(`完成日期: ${date.toLocaleDateString()}`, canvas.width / 2, 130);
+                
+                // 添加分割线
+                ctx.strokeStyle = '#ddd';
+                ctx.beginPath();
+                ctx.moveTo(50, 150);
+                ctx.lineTo(canvas.width - 50, 150);
+                ctx.stroke();
+                
+                // 添加问题回顾
+                ctx.textAlign = 'left';
+                ctx.font = 'bold 18px "Segoe UI", sans-serif';
+                ctx.fillStyle = '#333';
+                ctx.fillText('问题回顾:', 50, 180);
+                
+                // 添加每个问题的结果
+                const optionLetters = ['A', 'B', 'C', 'D'];
+                let yPos = 210;
+                
+                for (let i = 0; i < quizData.length; i++) {
+                    const question = quizData[i];
+                    const userAnswer = userAnswers[i];
+                    const isCorrect = userAnswer === question.answer;
+                    
+                    // 问题编号和状态
+                    ctx.font = 'bold 16px "Segoe UI", sans-serif';
+                    ctx.fillStyle = isCorrect ? '#28a745' : '#dc3545';
+                    ctx.fillText(`问题 ${i + 1}: ${isCorrect ? '✓ +20分' : '✗ +0分'}`, 50, yPos);
+                    
+                    // 用户选择和正确答案
+                    ctx.font = '14px "Segoe UI", sans-serif';
+                    ctx.fillStyle = '#555';
+                    ctx.fillText(`你的选择: ${optionLetters[userAnswer]} | 正确答案: ${optionLetters[question.answer]}`, 200, yPos);
+                    
+                    yPos += 30;
+                }
+                
+                // 添加底部信息
+                ctx.textAlign = 'center';
+                ctx.font = 'italic 14px "Segoe UI", sans-serif';
+                ctx.fillStyle = '#777';
+                ctx.fillText('继续学习，探索AI的奇妙世界！', canvas.width / 2, canvas.height - 30);
+            }
+            
+            // 下载结果图片
+            function downloadResult() {
+                const canvas = document.getElementById('result-canvas');
+                const link = document.createElement('a');
+                
+                // 设置下载属性
+                link.download = `AI知识测验结果_${score}分.png`;
+                link.href = canvas.toDataURL('image/png');
+                
+                // 模拟点击下载
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // 重新开始测验
+            function restartQuiz() {
+                // 重新对题目进行选项乱序
+                const newShuffledData = originalQuizData.map(shuffleOptions);
+                
+                // 更新题目数据
+                for (let i = 0; i < quizData.length; i++) {
+                    quizData[i] = newShuffledData[i];
+                }
+                
+                currentQuestion = 0;
+                score = 0;
+                userAnswers = [];
+                
+                // 清除粒子效果
+                const particlesContainer = document.getElementById('particles-container');
+                particlesContainer.innerHTML = '';
+                
+                // 重置进度条
+                document.getElementById('progress-container').style.display = 'flex';
+                
+                // 显示第一个问题
+                showQuestion(0);
+                updateProgress();
+            }
+            
+            // 当DOM加载完成后初始化应用
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initQuiz);
+            } else {
+                initQuiz();
+            }
+        })();
+    </script>
+</body>
+</html>
